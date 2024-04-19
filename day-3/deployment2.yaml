@@ -11,15 +11,14 @@ spec:
   selector:
     matchLabels:
       app: nginx-deployment
-  strategy: 
-    type: Recreate
+  strategy: {}
   template:  
     metadata:
       labels:
         app: nginx-deployment
     spec:
       containers:
-      - image: nginx:1.15.0
+      - image: nginx
         name: nginx-deployment
         volumeMounts:
         - mountPath: /giropops
