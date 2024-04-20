@@ -3,12 +3,11 @@ kind: Deployment
 metadata:
   labels:
     app: nginx-deployment
-    fruta: banana
     service: webserver
   name: nginx-deployment
   namespace: giropops
 spec:
-  replicas: 15
+  replicas: 10
   selector:
     matchLabels:
       app: nginx-deployment
@@ -20,8 +19,8 @@ spec:
         app: nginx-deployment
     spec:
       containers:
-      - image: nginx:1.17.0
-        name: opa
+      - image: nginx:1.15.0
+        name: nginx-deployment
         volumeMounts:
         - mountPath: /giropops
           name: primeiro-emptydir
