@@ -72,7 +72,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 ###Adicionando os outros Nodes
 kubeadm join 172.31.57.89:6443 --token if9hn9.xhxo6s89byj9rsmd \
-	--discovery-token-ca-cert-hash sha256:ad583497a4171d1fc7d21e2ca2ea7b32bdc8450a1a4ca4cfa2022748a99fa477
+	--discovery-token-ca-cert-hash sha256:chave
 
 ###Resolvendo o problema de rede: instalando Weave Net
 kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
