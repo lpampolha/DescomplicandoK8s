@@ -1,0 +1,11 @@
+sudo mkdir /mnt/nfs
+sudo chown  /mnt/nfs
+sudo apt-get install nfs-kernel-server nfs-common
+sudo vim /etc/exports
+/mnt/nfs        *(rw,sync,no_root_squash,no_subtree_check)
+sudo exportfs -ar
+showmount -e
+
+*opção para persistir é configurar o ponto de montagem no /etc/fstab
+
+
