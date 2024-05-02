@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     pvc: meu-primeiro-pvc
-  name: meu-pvc
+  name: meu-pvc-nfs
 spec:
   accessModes:
     - ReadWriteOnce

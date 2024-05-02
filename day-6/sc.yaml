@@ -5,3 +5,6 @@ metadata:
 provisioner: kubernetes.io/no-provisioner
 reclaimPolicy: Retain
 volumeBindingMode: WaitForFirstConsumer
+parameters:
+  path: "/testesk8s/local"
+  readOnly: "false"

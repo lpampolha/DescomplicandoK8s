@@ -7,5 +7,3 @@ sudo exportfs -ar
 showmount -e
 
 *opção para persistir é configurar o ponto de montagem no /etc/fstab
-
-

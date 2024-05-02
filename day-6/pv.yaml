@@ -11,5 +11,5 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
   hostPath:
-    path: "/mnt/data/pvlocal"
+    path: "/testesk8s/local"
   storageClassName: giropops

@@ -11,10 +11,9 @@ spec:
     ports:
     - containerPort: 80
     volumeMounts:
-    - name: meu-pvc
-      mountPath: /usr/share/nginx/html
+    - name: meu-pvc-local
+      mountPath: "/usr/share/nginx/html"
   volumes:
-  - name: meu-pvc
+  - name: meu-pvc-local
     persistentVolumeClaim:
-      claimName: meu-pvc
-
+      claimName: meu-pvc-local
