@@ -23,10 +23,11 @@ spec:
         - name: nginx-persistent-storage
           mountPath: /usr/share/nginx/html
   volumeClaimTemplates:
-  - metadata:
-      name: http
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
+    - metadata:
+        name: nginx-persistent-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 100Mi
+  
