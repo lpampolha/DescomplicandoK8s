@@ -57,3 +57,20 @@ k rollout status deployment -n giropops nginx-deployment
 
 ##### Para desfazer modificações
 k rollout undo deployment -n giropops nginx-deployment
+
+### Day-8
+#### Para ver a saída de uma palavra como base64
+echo -n "giropops" | base64 
+
+#### Criando um yaml de secret opaque
+apiVersion: v1
+kind: Secret
+metadata:
+  name: giropops-secret
+type: Opaque
+data: # Inicio dos dados
+    username: SmVmZXJzb25fbGluZG8=
+    password: Z2lyb3BvcHM=
+
+#### Criando um secret opaque através da linha de comando
+kubectl create secret generic giropops-secret --from-literal=username=SmVmZXJzb25fbGluZG8= --from-literal=password=Z2lyb3BvcHM=
