@@ -63,14 +63,41 @@ k rollout undo deployment -n giropops nginx-deployment
 echo -n "giropops" | base64 
 
 #### Criando um yaml de secret opaque
-apiVersion: v1
-kind: Secret
-metadata:
-  name: giropops-secret
-type: Opaque
-data: # Inicio dos dados
-    username: SmVmZXJzb25fbGluZG8=
-    password: Z2lyb3BvcHM=
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: giropops-secret
+  type: Opaque
+  data: # Inicio dos dados
+      username: SmVmZXJzb25fbGluZG8=
+      password: Z2lyb3BvcHM=
 
 #### Criando um secret opaque através da linha de comando
 kubectl create secret generic giropops-secret --from-literal=username=SmVmZXJzb25fbGluZG8= --from-literal=password=Z2lyb3BvcHM=
+
+#### Criando um secret para autenticar do Docker Hub, para acesso a imagens privadas 
+Primeiro passo é codificar o conteúdo do arquivo ~/.docker/config.json, com o sequinte comando:
+#base64 ~/.docker/config.json
+
+Agora é criar o arquivo dockerhub-secret.yaml, com o seguinte conteúdo:
+
+  kind: Secret
+  apiVersion: v1
+  metadata:
+    name: docker-hub-secret
+  type: kubernetes.io/dockerconsigjson
+  data:
+    .dockerconfigjson: | #aqui entra o valor do config.json codificado
+
+Para baixar a imagem privada, será necessário usar o campo spec.imagePullSecrets
+
+  kind: Pod
+  apiVersion: v1
+  metadata:
+    name: nginx-secret
+  spec:
+    containers:
+    - name: nginx-secret
+      image: lpampolha/linuxtips-giropops-senhas:5.0
+    imagePullSecrets:
+    - name: docker-hub-secret
