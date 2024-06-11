@@ -101,3 +101,45 @@ Para baixar a imagem privada, será necessário usar o campo spec.imagePullSecre
       image: lpampolha/linuxtips-giropops-senhas:5.0
     imagePullSecrets:
     - name: docker-hub-secret
+
+#### Criando secret TLS para armazenar certificado e chave TLS
+
+openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout chave-privada.key -out certificado.crt
+
+- Agora é criar o secret
+
+#kubectl create secret tls meu-servico-web-tls-secret --cert=certificado.crt --key=chave-privada.key
+
+- Vamos utilizar o secret para ter nginx com https, usando o campo spec.tls
+
+  kind: Pod
+  apiVersion: v1
+  metadata:
+    name: nginx
+    labels:
+      app: nginx
+  spec:
+    containers:
+      - name: nginx
+        image: nginx
+        ports:
+          - containerPort: 80
+          - containerPort: 443
+        volumeMounts:
+          - name: nginx-config-volume
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+          - name: nginx-tls
+            mountPath: /etc/nginx/tls
+      volumes:
+      - name: nginx-config-volume
+        configMap:
+          name: nginx-config
+      - name: nginx-tls
+        secret:
+          secretName: meu-servico-web-tls-secret
+          items:
+            - key: certificado.crt
+              path: certificado.crt
+            - key: chave-privada.key
+              path: chave-privada.key
