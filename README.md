@@ -143,3 +143,18 @@ openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout chave-privada.key -o
               path: certificado.crt
             - key: chave-privada.key
               path: chave-privada.key
+
+#### Criando o ConfigMap
+
+Criar arquivo nginx.conf
+Depois é rodar o create para criar o configmap
+
+  #kubectl create configmap nginx-config --from-file=nginx.conf
+
+Também é possível criar o configmap através de um manifesto (nginx-configmap.yaml)
+
+Agora é expor o pod
+  #kubectl expose pod nginx
+
+E dar um port-forward para testar
+  #kubectl port-forward service/nginx 4443:443
