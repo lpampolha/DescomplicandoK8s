@@ -1,0 +1,16 @@
+Primeiro é necessário criar o certificado
+#openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout nginx.key -out nginx.crt
+
+Agora criamos nosso secret
+#kubectl create secret tls nginx-secret --cert=nginx.crt --key=nginx.key
+
+Criando o arquivo nginx.conf
+#vim nginx.conf
+
+Já podemos criar o configmap baseado no arquivo nginx.conf
+
+#kubectl create configmap nginx-config --from-file nginx.conf
+
+Nesse ponto criamos o Pod, utilizando o configmap e o tls
+
+Agora é só expor o Pod

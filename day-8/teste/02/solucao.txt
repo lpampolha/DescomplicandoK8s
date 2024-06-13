@@ -1,0 +1,2 @@
+Só deletar o secret, e recriar
+#kubectl create secret tls nginx-secret --cert=nginx.crt --key=nginx.key

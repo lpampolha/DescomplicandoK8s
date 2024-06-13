@@ -158,3 +158,4 @@ Agora é expor o pod
 
 E dar um port-forward para testar
   #kubectl port-forward service/nginx 4443:443
+  
