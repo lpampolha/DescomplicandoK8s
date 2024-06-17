@@ -1,0 +1,78 @@
+### Day-9
+#### Instalando o eksctl, que é uma ferramenta para gerenciamento facilitado do EKS
+#### https://eksctl.io
+
+#curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+#sudo mv /tmp/eksctl /usr/local/bin
+#eksctl
+
+#### Depois vamos instalar o awscli, a fim de acessar nossa conta na AWS
+
+#curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#unzip awscliv2.zip
+#sudo ./aws/install
+
+Após configurar o awscli com o aws configure, já é possível criar o cluster EKS
+
+#eksctl create cluster --name=eks-cluster --version=1.24 --region=us-east-1 --nodegroup-name=eks-cluster-nodegroup --node-type=t2.micro --nodes=2 --nodes-min=1 --nodes-max=3 --managed
+
+Caso o kubectl ainda não estiver instalado, será necessário rodar o seguinte comando, após a instalação da ferramenta:
+
+#aws eks --region us-east-1 update-kubeconfig --name eks-cluster
+
+Esses são os comandos para verificar o cluster
+
+#kubectl get nodes -> Para verificar com o K8s
+#eksctl get cluster -A -> Para verificar todos os clusters da conta
+#eksctl get cluster -r us-east-1 -> Para verificar todos os clusters em uma região
+
+Para aumentar o número de nodes:
+#eksctl scale nodegroup --cluster=eks-cluster --nodes=3 --nodes-min=1 --nodes-max=3 --name=eks-cluster-nodegroup -r us-east-1
+
+Para diminuir o número de nodes:
+#eksctl scale nodegroup --cluster=eks-cluster --nodes=1 --nodes-min=1 --nodes-max=3 --name=eks-cluster-nodegroup -r us-east-1
+
+Para deletar o cluster:
+#eksctl delete cluster --name=eks-cluster -r us-east-1
+#eksctl delete cluster --name=eks-cluster
+
+#### Instalando o Kube-Prometheus
+
+O primeiro passo é clonar o repositório
+
+#git clone https://github.com/prometheus-operator/kube-prometheus
+
+Após isso, devemos acessar o diretório, e rodar o setup, a fim de aplicar os manifestos
+
+#cd kube-prometheus
+#kubectl create -f manifests/setup
+
+Vamos aplicar os manifestos.  Após isso, teremos o Prometheus e o AlertManager
+
+#kubectl apply -f manifests/
+
+O comando para verificar se os CRDs (Custom Resource Definitions) foram instalados é o seguinte:
+
+#kubectl get servicemonitors -A
+
+Já temos a Stack do Kube-Prometheus (Prometheus, Alertmanager, Blackbox Exporter e Grafana)
+
+Verificando se tudo foi instalado
+
+#kubectl get pods -n monitoring
+
+#### Acessando o Grafana, o Prometheus e o Alertmanager
+
+Vamos de port forward
+
+##### Grafana
+#kubectl port-forward -n monitoring svc/grafana 33000:3000
+#http://localhost:33000 -> o acesso padrão é admin/admin
+
+##### Prometheus
+#kubectl port-forward -n monitoring svc/prometheus 39090:9090
+#http://localhost:39090
+
+##### Alertmanager
+#kubectl port-forward -n monitoring svc/alertmanager 39093:9093
+#http://localhost:39093

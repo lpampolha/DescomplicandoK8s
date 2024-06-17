@@ -208,3 +208,32 @@ Após isso, devemos acessar o diretório, e rodar o setup, a fim de aplicar os m
 #cd kube-prometheus
 #kubectl create -f manifests/setup
 
+Vamos aplicar os manifestos.  Após isso, teremos o Prometheus e o AlertManager
+
+#kubectl apply -f manifests/
+
+O comando para verificar se os CRDs (Custom Resource Definitions) foram instalados é o seguinte:
+
+#kubectl get servicemonitors -A
+
+Já temos a Stack do Kube-Prometheus (Prometheus, Alertmanager, Blackbox Exporter e Grafana)
+
+Verificando se tudo foi instalado
+
+#kubectl get pods -n monitoring
+
+#### Acessando o Grafana, o Prometheus e o Alertmanager
+
+Vamos de port forward
+
+##### Grafana
+#kubectl port-forward -n monitoring svc/grafana 33000:3000
+#http://localhost:33000 -> o acesso padrão é admin/admin
+
+##### Prometheus
+#kubectl port-forward -n monitoring svc/prometheus 39090:9090
+#http://localhost:39090
+
+##### Alertmanager
+#kubectl port-forward -n monitoring svc/alertmanager 39093:9093
+#http://localhost:39093
