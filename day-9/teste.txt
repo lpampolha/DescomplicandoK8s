@@ -1,0 +1,13 @@
+Primeira parte do desafio
+
+Instalar o Kube-Prometheus
+
+Segunda parte:
+
+Quando você logar pela primeira vez com o usuário admin, mude a senha imediatamente.
+
+Durante esse desafio, você terá que usar o 'kubectl port-forward' para deixar o grafana disponível na porta 33000
+
+Um conselho importante, você vai precisar utilizar o parâmetro "--address=0.0.0.0" para que seja possível você acessar o Grafana através do navegador.
+
+Explore os dashboards, e divirta-se!
