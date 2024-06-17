@@ -196,3 +196,15 @@ Para diminuir o número de nodes:
 Para deletar o cluster:
 #eksctl delete cluster --name=eks-cluster -r us-east-1
 #eksctl delete cluster --name=eks-cluster
+
+#### Instalando o Kube-Prometheus
+
+O primeiro passo é clonar o repositório
+
+#git clone https://github.com/prometheus-operator/kube-prometheus
+
+Após isso, devemos acessar o diretório, e rodar o setup, a fim de aplicar os manifestos
+
+#cd kube-prometheus
+#kubectl create -f manifests/setup
+
