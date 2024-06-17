@@ -158,4 +158,41 @@ Agora é expor o pod
 
 E dar um port-forward para testar
   #kubectl port-forward service/nginx 4443:443
-  
+
+### Day-9
+#### Instalando o eksctl, que é uma ferramenta para gerenciamento facilitado do EKS
+#### https://eksctl.io
+
+#curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+#sudo mv /tmp/eksctl /usr/local/bin
+#eksctl
+
+#### Depois vamos instalar o awscli, a fim de acessar nossa conta na AWS
+
+#curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+#unzip awscliv2.zip
+#sudo ./aws/install
+
+Após configurar o awscli com o aws configure, já é possível criar o cluster EKS
+
+#eksctl create cluster --name=eks-cluster --version=1.24 --region=us-east-1 --nodegroup-name=eks-cluster-nodegroup --node-type=t2.micro --nodes=2 --nodes-min=1 --nodes-max=3 --managed
+
+Caso o kubectl ainda não estiver instalado, será necessário rodar o seguinte comando, após a instalação da ferramenta:
+
+#aws eks --region us-east-1 update-kubeconfig --name eks-cluster
+
+Esses são os comandos para verificar o cluster
+
+#kubectl get nodes -> Para verificar com o K8s
+#eksctl get cluster -A -> Para verificar todos os clusters da conta
+#eksctl get cluster -r us-east-1 -> Para verificar todos os clusters em uma região
+
+Para aumentar o número de nodes:
+#eksctl scale nodegroup --cluster=eks-cluster --nodes=3 --nodes-min=1 --nodes-max=3 --name=eks-cluster-nodegroup -r us-east-1
+
+Para diminuir o número de nodes:
+#eksctl scale nodegroup --cluster=eks-cluster --nodes=1 --nodes-min=1 --nodes-max=3 --name=eks-cluster-nodegroup -r us-east-1
+
+Para deletar o cluster:
+#eksctl delete cluster --name=eks-cluster -r us-east-1
+#eksctl delete cluster --name=eks-cluster
