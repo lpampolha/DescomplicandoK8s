@@ -1,0 +1,79 @@
+# Simulando AWS com LocalStack e Terraform
+
+https://localstack.cloud/
+
+#### Instalação
+https://docs.localstack.cloud/getting-started/installation/
+
+#curl -Lo localstack-cli-3.5.0-linux-amd64-onefile.tar.gz \
+    https://github.com/localstack/localstack-cli/releases/download/v3.5.0/localstack-cli-3.5.0-linux-amd64-onefile.tar.gz
+
+#tar xvzf localstack-cli-3.5.0-linux-amd64-onefile.tar.gz
+# sudo mv localstack /usr/local/bin
+#localstack
+#localstack start
+#https://github.com/badtuxx/terraform-101.git -> acesse, e deixe um star
+#git clone git@github.com:badtuxx/terraform-101.git
+#cd terraform-101
+#cd terraform/main
+#vim ~/.aws/config
+
+    [localstack]
+    region = us-east-1
+    output = json
+    endpoint_url = http://localhost:4566
+
+#ss -atunp | grep 4566
+#vim ~/.aws/credentials
+
+    [localstack]
+    aws_access_key_id = giropops
+    aws_secret_access_key = strigus
+
+#aws s3 ls --profile localstack
+#aws s3 mb s3://giropops-bucket --profile localstack
+
+#vim main.tf -> corrigir ip da vpc
+
+#vim provider.tf
+
+provider "aws" {
+    access_key = "giropops"
+    secret_key = "strigus"
+    region = "us-east-1"
+
+    s3_use_path_style = true
+    skip_credentials_validation = true
+    skip_metadata_api_check = true
+    skip_requesting_account_id = true
+
+    endpoints {
+        apigateway = "http://localhost:4566"
+        apigatewayv2 = "http://localhost:4566"
+        cloudformation = "http://localhost:4566"
+        cloudwatch = "http://localhost:4566"
+        dynamodb = "http://localhost:4566"
+        ec2 = "http://localhost:4566"
+        es = "http://localhost:4566"
+        elasticache = "http://localhost:4566"
+        firehose = "http://localhost:4566"
+        iam = "http://localhost:4566"
+        kinesis = "http://localhost:4566"
+        lambda = "http://localhost:4566"
+        rds = "http://localhost:4566"
+        redshift = "http://localhost:4566"
+        route53 = "http://localhost:4566"
+        s3 = "http://localhost:4566"
+        secretsmanager = "http://localhost:4566"
+        ses = "http://localhost:4566"
+        sns = "http://localhost:4566"
+        sqs = "http://localhost:4566"
+        ssm = "http://localhost:4566"
+        stepfunctions = "http://localhost:4566"
+        sts = "http://localhost:4566"
+    }
+}
+
+#terraform init
+#terraform plan
+#terraform apply
