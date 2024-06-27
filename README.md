@@ -335,3 +335,139 @@ Para verificar se o Nginx está rodando
 Verificando as métricas:
 #curl http://<EXTERNAL-IP-DO-SERVICE>:80/nginx_status
 #curl http://<EXTERNAL-IP-DO-SERVICE>:80/metrics
+
+#### Criando o primeiro ServiceMonitor
+
+#vim servicemonitor.yaml
+
+  apiVersion: monitoring.coreos.com/v1 # versão da API
+  kind: ServiceMonitor # tipo de recurso, no caso, um ServiceMonitor do Prometheus Operator
+  metadata: # metadados do recurso
+    name: nginx-servicemonitor # nome do recurso
+    labels: # labels do recurso
+      app: nginx # label que identifica o app
+  spec: # especificação do recurso
+    selector: # seletor para identificar os pods que serão monitorados
+      matchLabels: # labels que identificam os pods que serão monitorados
+        app: nginx # label que identifica o app que será monitorado
+    endpoints: # endpoints que serão monitorados
+      - interval: 10s # intervalo de tempo entre as requisições
+        path: /metrics # caminho para a requisição
+        targetPort: 9113 # porta do target
+
+#### PodMonitors
+
+Para situações nas quais não temos um service na frente.
+
+#vim podmonitor.yaml
+
+  apiVersion: monitoring.coreos.com/v1 # versão da API
+  kind: PodMonitor # tipo de recurso, no caso, um PodMonitor do Prometheus Operator
+  metadata: # metadados do recurso
+    name: nginx-podmonitor # nome do recurso
+    labels: # labels do recurso
+      app: nginx # label que identifica o app
+  spec:
+    namespaceSelector: # seletor de namespaces
+      matchNames: # namespaces que serão monitorados
+        - default # namespace que será monitorado
+    selector: # seletor para identificar os pods que serão monitorados
+      matchLabels: # labels que identificam os pods que serão monitorados
+        app: nginx # label que identifica o app que será monitorado
+    podMetricsEndpoints: # endpoints que serão monitorados
+      - interval: 10s # intervalo de tempo entre as requisições
+        path: /metrics # caminho para a requisição
+        targetPort: 9113 # porta do target
+  
+  ##### Subindo um Pod antes de deployar o monitor
+
+  apiVersion: v1 # versão da API
+  kind: Pod # tipo de recurso, no caso, um Pod
+  metadata: # metadados do recurso
+    name: nginx-pod # nome do recurso
+    labels: # labels do recurso
+      app: nginx # label que identifica o app
+  spec: # especificações do recursos
+    containers: # containers do template 
+      - name: nginx-container # nome do container
+        image: nginx # imagem do container do Nginx
+        ports: # portas do container
+          - containerPort: 80 # porta do container
+            name: http # nome da porta
+        volumeMounts: # volumes que serão montados no container
+          - name: nginx-config # nome do volume
+            mountPath: /etc/nginx/conf.d/default.conf # caminho de montagem do volume
+            subPath: nginx.conf # subpath do volume
+      - name: nginx-exporter # nome do container que será o exporter
+        image: 'nginx/nginx-prometheus-exporter:0.11.0' # imagem do container do exporter
+        args: # argumentos do container
+          - '-nginx.scrape-uri=http://localhost/metrics' # argumento para definir a URI de scraping
+        resources: # recursos do container
+          limits: # limites de recursos
+            memory: 128Mi # limite de memória
+            cpu: 0.3 # limite de CPU
+        ports: # portas do container
+          - containerPort: 9113 # porta do container que será exposta
+            name: metrics # nome da porta
+    volumes: # volumes do template
+      - configMap: # configmap do volume, nós iremos criar esse volume através de um configmap
+          defaultMode: 420 # modo padrão do volume
+          name: nginx-config # nome do configmap
+        name: nginx-config # nome do volume
+
+#### Criando alertas no Prometheus e AlertManager através do PrometheusRule
+
+#vim prometheusrule.yaml
+
+  apiVersion: monitoring.coreos.com/v1 # Versão da api do PrometheusRule
+  kind: PrometheusRule # Tipo do recurso
+  metadata: # Metadados do recurso (nome, namespace, labels)
+    name: nginx-prometheus-rule
+    namespace: monitoring
+    labels: # Labels do recurso
+      prometheus: k8s # Label que indica que o PrometheusRule será utilizado pelo Prometheus do Kubernetes
+      role: alert-rules # Label que indica que o PrometheusRule contém regras de alerta
+      app.kubernetes.io/name: kube-prometheus # Label que indica que o PrometheusRule faz parte do kube-prometheus
+      app.kubernetes.io/part-of: kube-prometheus # Label que indica que o PrometheusRule faz parte do kube-prometheus
+  spec: # Especificação do recurso
+    groups: # Lista de grupos de regras
+    - name: nginx-prometheus-rule # Nome do grupo de regras
+      rules: # Lista de regras
+      - alert: NginxDown # Nome do alerta
+        expr: up{job="nginx"} == 0 # Expressão que será utilizada para disparar o alerta
+        for: 1m # Tempo que a expressão deve ser verdadeira para que o alerta seja disparado
+        labels: # Labels do alerta
+          severity: critical # Label que indica a severidade do alerta
+        annotations: # Anotações do alerta
+          summary: "Nginx is down" # Título do alerta
+          description: "Nginx is down for more than 1 minute. Pod name: {{ $labels.pod }}" # Descrição do alertaapiVersion: monitoring.coreos.com/v1 # Versão da api do PrometheusRule
+kind: PrometheusRule # Tipo do recurso
+metadata: # Metadados do recurso (nome, namespace, labels)
+  name: nginx-prometheus-rule
+  namespace: monitoring
+  labels: # Labels do recurso
+    prometheus: k8s # Label que indica que o PrometheusRule será utilizado pelo Prometheus do Kubernetes
+    role: alert-rules # Label que indica que o PrometheusRule contém regras de alerta
+    app.kubernetes.io/name: kube-prometheus # Label que indica que o PrometheusRule faz parte do kube-prometheus
+    app.kubernetes.io/part-of: kube-prometheus # Label que indica que o PrometheusRule faz parte do kube-prometheus
+spec: # Especificação do recurso
+  groups: # Lista de grupos de regras
+  - name: nginx-prometheus-rule # Nome do grupo de regras
+    rules: # Lista de regras
+    - alert: NginxDown # Nome do alerta
+      expr: up{job="nginx"} == 0 # Expressão que será utilizada para disparar o alerta
+      for: 1m # Tempo que a expressão deve ser verdadeira para que o alerta seja disparado
+      labels: # Labels do alerta
+        severity: critical # Label que indica a severidade do alerta
+      annotations: # Anotações do alerta
+        summary: "Nginx is down" # Título do alerta
+        description: "Nginx is down for more than 1 minute. Pod name: {{ $labels.pod }}" # Descrição do alerta
+
+    - alert: NginxHighRequestRate # Nome do alerta
+        expr: rate(nginx_http_requests_total{job="nginx"}[5m]) > 10 # Expressão que será utilizada para disparar o alerta
+        for: 1m # Tempo que a expressão deve ser verdadeira para que o alerta seja disparado
+        labels: # Labels do alerta
+            severity: warning # Label que indica a severidade do alerta
+        annotations: # Anotações do alerta
+            summary: "Nginx is receiving high request rate" # Título do alerta
+            description: "Nginx is receiving high request rate for more than 1 minute. Pod name: {{ $labels.pod }}" # Descrição do alerta
