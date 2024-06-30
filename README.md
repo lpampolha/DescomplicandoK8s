@@ -534,4 +534,14 @@ Para analisar logs no ingress controller
 
 Ao configurar o apontamento para bater no / , o serviço funciona perfeitamente.  Mas isso considerando um site somente, como está no arquivo ingress-3.yaml
 
+#### Testando Ingress com múltiplos arquivos
+
+Para testar mais de um apontamento, com dois arquivos de Ingress diferentes, suba um nginx, o exponha, e depois suba o Ingress para ele.  
+
+#k run nginx --image nginx --port 80
+#k expose po nginx
+#k apply -f ingress-4.yaml
+
+Esse teste foi feito adicionando spec.rules.host: giropops.nginx.io . Para teste na máquina, adicione um apontamento no arquivo hosts
+
 
