@@ -471,3 +471,62 @@ spec: # Especificação do recurso
         annotations: # Anotações do alerta
             summary: "Nginx is receiving high request rate" # Título do alerta
             description: "Nginx is receiving high request rate for more than 1 minute. Pod name: {{ $labels.pod }}" # Descrição do alerta
+
+### Day-11
+#### Usando o kind com ingress
+
+Criando o cluster
+#vim cluster.yaml
+
+  kind: Cluster
+  apiVersion: kind.x-k8s.io/v1alpha4
+  nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+    - |
+      kind: InitConfiguration
+      nodeRegistration:
+        kubeletExtraArgs:
+          node-labels: "ingress-ready=true"
+    extraPortMappings:
+    - containerPort: 80
+      hostPort: 80
+      protocol: TCP
+    - containerPort: 443
+      hostPort: 443
+      protocol: TCP
+
+#kind create cluster --config kind-config.yaml
+
+#### Instalando o Ingress Nginx Controller no Kind
+
+#kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+#kubectl wait --namespace ingress-nginx \
+  --for=condition=ready pod \
+  --selector=app.kubernetes.io/component=controller \
+  --timeout=90s
+
+#### Deploy da aplicação de exemplo
+
+  -app-deployment.yaml
+  -app-service.yaml
+  -redis-deployment.yaml
+  -redis-service.yaml
+
+#### Criando a primeira regra de Ingress
+
+  -ingress-1.yaml
+
+verificando
+#k get ingress
+
+#### Pegar o Address do Ingress
+
+#k get ingress giropops-senhas -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+
+#### Pegar o Address do Ingress caso esteja utilizando algum provedor cloud
+
+#k get ingress giropops-senhas -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+
+
