@@ -4,4 +4,5 @@ day-8/teste/01/*.crt
 day-8/teste/01/*.key
 day-10.1
 day-9.1/terraform-101
+day-9.1/terraform-101/*
 day-9.1/localstack-cli-3.5.0-linux-amd64-onefile.tar.gz

@@ -529,4 +529,5 @@ verificando
 
 #k get ingress giropops-senhas -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
 
-
+Para analisar logs no ingress controller
+#k logs -f ingress-nginx-controller-7b76f68b64-bfbws -n ingress-nginx 
